@@ -9,6 +9,11 @@ const { Blog } = require('./models')
 
 app.use(express.json())
 app.use('/api/blogs', blogsRouter)
+app.use((req, res, next) => {
+  console.error(error)
+
+  res.status(400).json({ error: error.message })
+})
 
 
 
