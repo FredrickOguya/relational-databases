@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "start": "node cli.js"
+    "start": "node index.js"
   },
   "dependencies": {
     "dotenv": "^18.0.8",

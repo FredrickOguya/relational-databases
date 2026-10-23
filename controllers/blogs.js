@@ -26,7 +26,7 @@ router.post('/', async (req, res) => {
 })
 
 router.get('/:id', blogFinder, async (req, res) => {
-  res.json(req.body)
+  res.json(req.blog)
 })
 
 router.delete('/:id', blogFinder, async (req, res) => {
@@ -34,11 +34,19 @@ router.delete('/:id', blogFinder, async (req, res) => {
   res.status(204).end()
 })
 
-router.put('/:id', async (req, res) => {
-  req.blog.important = req.body.important
-  await req.blog.save()
-  res.status(req.blog)
+router.put('/:id',blogFinder, async (req, res) => {
+  try {
+    if(req.body.likes !== undefined) {
+      req.blog.likes = req.body.likes
+
+      await req.blog.save()
+      res.json(req.blog)
+    } else {
+      res.status(400).json({ error: 'Like field is required'})
+    }
+  }catch (error) {
+    res.status(400).json({ error: error.message })
   }
-)
+})
 
 module.exports = router
