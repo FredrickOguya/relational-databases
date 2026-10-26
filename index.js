@@ -20,6 +20,24 @@ app.use('/api/login', loginRouter)
 
 const PORT = process.env.PORT || 3001
 
+app.use((error, req, res, next) => {
+  if(error.name === 'SequelizeValidationError' ||
+     error.name === 'SequelizeUniqueConstraintError'
+  ) {
+    return res.status(400).json({
+      error: error.errors.map(e => e.message)
+    })
+  }
+
+  if (error.name === 'SequelizeUniqueConstraintError') {
+    return res.status(400).json({
+      error: error.errors.map(e => e.message)
+    })
+  }
+
+  next(error)
+})
+
 const start = async () => {
   await connectToDatabase()
   await syncModels()
