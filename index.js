@@ -6,12 +6,14 @@ const app = express()
 const blogsRouter = require('./controllers/blogs')
 const usersRouter = require('./controllers/users')
 const loginRouter = require('./controllers/login')
+const { tokenExtractor } = require('./util/middleware')
 
 const { sequelize, connectToDatabase } = require('./util/db')
 
 const { Blog, syncModels } = require('./models')
 
 app.use(express.json())
+app.use(tokenExtractor)
 
 app.use('/api/blogs', blogsRouter)
 app.use('/api/users', usersRouter)
