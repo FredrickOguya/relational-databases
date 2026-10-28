@@ -23,9 +23,18 @@ router.get('/', async (req, res) => {
 
   const blogs = await Blog.findAll({
     where: search ? {
-      title: {
-        [Op.iLike]: `%${search}`
-      }
+      [Op.or]: [
+        {
+          title: {
+            [Op.iLike]: `%${search}%`
+          }
+        },
+        {
+          author: {
+            [Op.iLike]: `%${search}%`
+          }
+        }
+      ]
     } : {},
     include: {
       model: User,
