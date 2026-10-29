@@ -11,7 +11,7 @@ const resetRouter = require('./controllers/reset')
 
 const { tokenExtractor } = require('./util/middleware')
 
-const { sequelize, connectToDatabase } = require('./util/db')
+const { sequelize, connectToDatabase, migrator } = require('./util/db')
 
 const { Blog, syncModels } = require('./models')
 
@@ -50,7 +50,8 @@ app.use((error, req, res, next) => {
 
 const start = async () => {
   await connectToDatabase()
-  await syncModels()
+  await migrator.up()
+  
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
   })

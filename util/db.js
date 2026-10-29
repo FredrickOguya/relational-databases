@@ -1,5 +1,8 @@
 const Sequelize = require('sequelize')
 const { DATABASE_URL } = require('./config')
+const { Umzug, SequelizeStorage } = require('umzug')
+
+
 
 const sequelize = new Sequelize(DATABASE_URL, {
   dialectOptions: {
@@ -22,4 +25,16 @@ const connectToDatabase = async () => {
   return null
 }
 
-module.exports = { connectToDatabase, sequelize }
+const migrator = new Umzug({
+  migrations: {
+    glob: 'migrations/*.js',
+  },
+  context: sequelize.getQueryInterface(),
+  storage: new SequelizeStorage({
+    sequelize,
+    tableName: 'migrations',
+  }),
+  logger: console,
+})
+
+module.exports = { connectToDatabase, sequelize, migrator }
