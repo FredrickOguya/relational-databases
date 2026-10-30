@@ -3,19 +3,6 @@ const bcrypt = require('bcrypt')
 
 const { User, Blog } = require('../models')
 
-router.get('/', async (req, res) => {
-  try {
-    const users = await User.findAll({
-      include: {
-        model: Blog,
-        as: 'authoredBlogs',
-      }
-    })
-  res.json(users)
-  } catch (error) {
-    next(error)
-  }
-})
 
 router.post('/', async (req, res, next) => {
   try {
@@ -52,6 +39,18 @@ router.get('/', async (req, res, next) => {
 
 router.get('/:id', async (req, res, next) => {
   try {
+
+    const read = req.query.read
+
+    const throughOptions = {
+      attributes: ['id', 'read'],
+    }
+
+    if (read === 'true' || read === 'false') {
+      throughOptions.where = {
+        read: read === 'true',
+      }
+    }
     const user = await User.findByPk(req.params.id, {
       attributes: {
         exclude: ['password'],
@@ -67,9 +66,7 @@ router.get('/:id', async (req, res, next) => {
           'likes',
           'year',
         ],
-        through: {
-          attributes: ['id', 'read'],
-        },
+        through: throughOptions,
       },
     })
 
