@@ -58,7 +58,7 @@ router.put('/:id', userExtractor, async (req, res, next) => {
     }
 
     if(readingList.userId !== req.decodedToken.id) {
-      return res.status(403).json({
+      return res.status(401).json({
         error: 'You can only update your own reading'
       })
     }

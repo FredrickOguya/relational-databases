@@ -25,13 +25,25 @@ router.post('/', async (req, res, next) => {
 router.get('/', async (req, res, next) => {
   try {
     const users = await User.findAll({
+      attributes: {
+        exclude: ['password']
+      },
       include: {
         model: Blog,
         as: 'authoredBlogs',
       },
     })
 
-    res.json(users)
+    const usersWithBlogs = users.map(user => {
+      const userData = user.toJSON()
+
+      userData.blogs = userData.authoredBlogs
+      delete userData.authoredBlogs
+
+      return userData
+    })
+
+    res.json(usersWithBlogs)
   } catch (error) {
     next(error)
   }
