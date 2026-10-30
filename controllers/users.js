@@ -68,7 +68,7 @@ router.get('/:id', async (req, res, next) => {
           'year',
         ],
         through: {
-          attributes: [],
+          attributes: ['id', 'read'],
         },
       },
     })
@@ -81,7 +81,14 @@ router.get('/:id', async (req, res, next) => {
 
     const userData = user.toJSON()
 
-    userData.readings = userData.readingList
+    userData.readings = userData.readingList.map(blog => {
+      const { reading_list, ...blogData } = blog
+
+      return {
+        ...blogData,
+        readingList: reading_list
+      }
+    })
     delete userData.readingList
 
     res.json(userData)

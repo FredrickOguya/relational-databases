@@ -38,6 +38,7 @@ router.get('/', async (req, res) => {
     } : {},
     include: {
       model: User,
+      as: 'user',
       attributes: ['id', 'name', 'username']
     },
     order: [['likes', 'DESC']]
