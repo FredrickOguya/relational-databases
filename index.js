@@ -8,6 +8,7 @@ const usersRouter = require('./controllers/users')
 const loginRouter = require('./controllers/login')
 const authorsRouter = require('./controllers/authors')
 const resetRouter = require('./controllers/reset')
+const readinglistsRouter = require('./controllers/readinglists')
 
 const { tokenExtractor } = require('./util/middleware')
 
@@ -26,6 +27,7 @@ app.use('/api/users', usersRouter)
 app.use('/api/login', loginRouter)
 app.use('/api/authors', authorsRouter)
 app.use('/api/reset', resetRouter)
+app.use('/api/readinglists', readinglistsRouter)
 
 
 const PORT = process.env.PORT || 3001
