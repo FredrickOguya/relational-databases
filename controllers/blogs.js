@@ -77,19 +77,32 @@ router.delete('/:id', userExtractor, blogFinder, async (req, res, next) => {
  }
 })
 
-router.put('/:id',blogFinder, async (req, res, next) => {
-  try {
-    if(req.body.likes !== undefined) {
-      req.blog.likes = req.body.likes
 
-      await req.blog.save()
-      res.json(req.blog)
-    } else {
-      res.status(400).json({ error: 'Like field is required'})
+router.put('/:id', blogFinder, async (req, res, next) => {
+  try {
+    const { likes, year } = req.body
+
+    if (likes !== undefined) {
+      req.blog.likes = likes
     }
-  }catch (error) {
+
+    if (year !== undefined) {
+      req.blog.year = year
+    }
+
+    if (likes === undefined && year === undefined) {
+      return res.status(400).json({
+        error: 'At least one field (likes or year) is required',
+      })
+    }
+
+    await req.blog.save()
+
+    res.json(req.blog)
+  } catch (error) {
     next(error)
   }
 })
+
 
 module.exports = router
