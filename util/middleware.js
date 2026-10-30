@@ -1,10 +1,12 @@
+
 const jwt = require('jsonwebtoken')
 const { SECRET } = require('./config')
+const { User, Session } = require('../models')
 
 const tokenExtractor = (req, res, next) => {
   const authorization = req.get('authorization')
 
-  if (authorization && authorization.toLowerCase().startsWith('bearer ')){
+  if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
     req.token = authorization.substring(7)
   } else {
     req.token = null
@@ -13,18 +15,46 @@ const tokenExtractor = (req, res, next) => {
   next()
 }
 
-const userExtractor = (req, res, next) => {
-  try {
-    const decodedToken = jwt.verify(req.token, SECRET)
+const userExtractor = async (req, res, next) => {
+  let decodedToken
 
-    if(!decodedToken.id) {
-      return res.status(401).json({ error: 'token invalid'})
+  // First, verify the JWT
+  try {
+    decodedToken = jwt.verify(req.token, SECRET)
+  } catch (error) {
+    return res.status(401).json({
+      error: 'token missing or invalid'
+    })
+  }
+
+  if (!decodedToken.id) {
+    return res.status(401).json({
+      error: 'token invalid'
+    })
+  }
+
+  // Next, check whether the session still exists
+  try {
+    const session = await Session.findOne({
+      where: { token: req.token },
+      include: {
+        model: User,
+        as: 'user'
+      }
+    })
+
+    if (!session || !session.user || session.user.disabled) {
+      return res.status(401).json({
+        error: 'session invalid or user disabled'
+      })
     }
 
     req.decodedToken = decodedToken
+    req.user = session.user
+
     next()
   } catch (error) {
-    return res.status(401).json({ error: 'token missing or invalid' })
+    next(error)
   }
 }
 
